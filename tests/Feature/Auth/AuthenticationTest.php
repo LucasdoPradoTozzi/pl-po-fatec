@@ -67,3 +67,27 @@ test('users can logout', function () {
     $response->assertRedirect(route('home'));
     $this->assertGuest();
 });
+
+test('bypass user can authenticate when bypass login is enabled', function () {
+    config()->set('services.bypass_user.enabled', true);
+    config()->set('services.bypass_user.name', 'Bypass Tester');
+    config()->set('services.bypass_user.email', 'bypass@test.local');
+
+    $response = $this->post(route('auth.bypass'));
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('dashboard', absolute: false));
+
+    $this->assertAuthenticated();
+    $this->assertSame('bypass@test.local', auth()->user()->email);
+});
+
+test('bypass login is unavailable when disabled', function () {
+    config()->set('services.bypass_user.enabled', false);
+
+    $response = $this->post(route('auth.bypass'));
+
+    $response->assertNotFound();
+    $this->assertGuest();
+});

@@ -18,6 +18,9 @@ Route::view('dashboard', 'dashboard')
 
 Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])->name('auth.redirect');
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('auth.callback');
+Route::post('/auth/bypass', [SocialiteController::class, 'bypass'])
+    ->middleware('guest')
+    ->name('auth.bypass');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

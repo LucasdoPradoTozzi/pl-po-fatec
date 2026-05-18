@@ -68,6 +68,15 @@
                 </svg>
                 {{ __("Continue with Google") }}
             </flux:button>
+
+            @if (app()->environment(['local', 'testing']) && config('services.bypass_user.enabled'))
+            <form method="POST" action="{{ route('auth.bypass') }}">
+                @csrf
+                <flux:button variant="ghost" type="submit" class="w-full">
+                    {{ __("Bypass login (dev)") }}
+                </flux:button>
+            </form>
+            @endif
         </div>
 
         @if (Route::has('register'))

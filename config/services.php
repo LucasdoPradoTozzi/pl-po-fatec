@@ -41,4 +41,15 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'bypass_user' => [
+        'enabled' => env('BYPASS_USER_ENABLED', false),
+        'name' => env('BYPASS_USER_NAME', 'Bypass User'),
+        'email' => env('BYPASS_USER_EMAIL'),
+    ],
+
+    'ortools' => [
+        'endpoint' => env('ORTOOLS_SOLVER_ENDPOINT', 'http://ortools-api:8001/solve'),
+        'timeout' => (int) env('ORTOOLS_SOLVER_TIMEOUT', 60),
+    ],
+
 ];

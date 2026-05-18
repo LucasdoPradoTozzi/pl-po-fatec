@@ -2,6 +2,56 @@
 
 A Laravel 12 (PHP 8.4) starter template with Docker, featuring PostgreSQL, Redis, RabbitMQ, and Nginx. This is a base setup ready for you to start building your application.
 
+## Operations Research Lab (Livewire)
+
+This project now includes an educational Operations Research web app at `/dashboard` with:
+
+- Natural language problem input
+- AI-generated LP model (JSON schema validated)
+- Editable mathematical model form
+- Academic mode (step-by-step simplex)
+- Industrial mode (FastAPI + OR-Tools)
+- Modal-based results without losing page state
+
+### Core Architecture
+
+- `app/Livewire/Operations/Lab.php`: orchestrates screen state and UX flow
+- `app/Actions/Operations/GenerateLinearModelFromDescription.php`: AI generation use case
+- `app/Services/AI/*`: LLM client + safe parser
+- `app/Services/Solvers/Academic/*`: educational simplex engine + limits
+- `app/Services/Solvers/Industrial/OrToolsClient.php`: HTTP client to FastAPI
+- `app/DTO/LinearProblem/*`: model DTOs
+- `app/Support/LinearProblemSchemaValidator.php`: strict schema validation
+- `microservices/ortools/*`: industrial solver microservice
+
+### State Invalidation Rules
+
+When any problem field changes, the app automatically:
+
+- invalidates previous results
+- clears academic and industrial cache
+- resets simplex step history navigation
+- closes active result modal
+
+### LLM Environment
+
+Set these variables in `.env`:
+
+- `GITHUBAI_API_KEY`
+- `GITHUBAI_ENDPOINT`
+- `GITHUBAI_TIMEOUT`
+- `LLM_PRIMARY_MODEL`
+- retry/circuit/quota `LLM_*` variables (already documented in `.env.example`)
+
+### OR-Tools Microservice
+
+The `ortools-api` service is included in `docker-compose.yml` and exposes:
+
+- `POST /solve`
+- `GET /health`
+
+Laravel calls `ORTOOLS_SOLVER_ENDPOINT` (default: `http://ortools-api:8001/solve`).
+
 ## Tech Stack
 
 - **Laravel** - PHP Framework

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
@@ -53,6 +54,43 @@ class SocialiteController extends Controller
     }
 
     /**
+     * Authenticate a local bypass user (development/testing only).
+     */
+    public function bypass(Request $request)
+    {
+        if (! $this->canUseBypassLogin()) {
+            abort(404);
+        }
+
+        $email = (string) config('services.bypass_user.email');
+        $name = (string) config('services.bypass_user.name', 'Bypass User');
+
+        if (blank($email)) {
+            return redirect()->route('login')->withErrors([
+                'error' => 'Bypass user email is missing. Set BYPASS_USER_EMAIL in your .env file.',
+            ]);
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name' => $name,
+                'email_verified_at' => now(),
+                'password' => Hash::make(Str::random(40)),
+            ]
+        );
+
+        if (is_null($user->email_verified_at)) {
+            $user->forceFill(['email_verified_at' => now()])->save();
+        }
+
+        Auth::login($user, remember: true);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('dashboard', absolute: false));
+    }
+
+    /**
      * Validate the OAuth provider.
      */
     protected function validateProvider(string $provider): void
@@ -62,5 +100,11 @@ class SocialiteController extends Controller
         if (!in_array($provider, $allowedProviders)) {
             abort(404, 'Invalid OAuth provider');
         }
+    }
+
+    protected function canUseBypassLogin(): bool
+    {
+        return app()->environment(['local', 'testing'])
+            && (bool) config('services.bypass_user.enabled', false);
     }
 }
