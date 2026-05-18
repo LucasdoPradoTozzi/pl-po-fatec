@@ -158,7 +158,7 @@ class AcademicSimplexService
                 'tableau_before' => $this->roundMatrix($before),
                 'operations' => $ops,
                 'tableau_after' => $this->roundMatrix($tableau),
-                'explanation' => 'Normalize pivot row and eliminate pivot column in other rows.',
+                'explanation' => 'Normalize a linha pivô e elimine a coluna pivô nas demais linhas.',
             ];
 
             $stepNumber++;

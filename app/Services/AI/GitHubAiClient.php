@@ -110,6 +110,13 @@ Rules:
 - No text outside JSON.
 - objective.type must be maximize or minimize.
 - Use linear expressions with named variables.
+- Write all human-readable text fields in Brazilian Portuguese (pt-BR):
+    - title
+    - problem_summary
+    - complexity_reason
+    - warnings entries
+    - variables[].meaning
+- objective.expression should remain a mathematical linear expression (for example: 8*x1 + 12*x2).
 PROMPT;
     }
 

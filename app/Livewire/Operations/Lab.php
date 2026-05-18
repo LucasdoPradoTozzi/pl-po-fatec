@@ -201,8 +201,9 @@ class Lab extends Component
     public function nextStep(): void
     {
         $steps = $this->state['academicResult']['steps'] ?? [];
-
-        if ($this->currentStepIndex < (count($steps) - 1)) {
+        $totalSteps = count($steps);
+        // Permite avançar até um índice além do último passo para exibir a resposta final
+        if ($this->currentStepIndex < $totalSteps) {
             $this->currentStepIndex++;
         }
     }
