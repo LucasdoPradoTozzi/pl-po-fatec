@@ -9,6 +9,9 @@ rm -f /var/run/php-fpm.sock
 echo "Running database migrations..."
 php artisan migrate --force --no-interaction
 
+echo "Running database seeders..."
+php artisan db:seed --force --no-interaction
+
 echo "=== Caching configs with runtime environment ==="
 php artisan config:cache
 # php artisan event:cache
