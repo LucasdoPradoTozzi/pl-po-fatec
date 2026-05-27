@@ -39,9 +39,16 @@ echo "=== Starting Nginx in background ==="
 nginx -g "daemon off;" &
 NGINX_PID=$!
 
+echo "=== Starting OR-Tools API in background ==="
+cd /var/www/html/microservices/ortools
+/var/www/html/microservices/ortools/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8001 &
+ORTOOLS_PID=$!
+cd /var/www/html
+
 echo "=== Services started, monitoring processes ==="
 echo "PHP-FPM PID: $PHP_FPM_PID"
 echo "Nginx PID: $NGINX_PID"
+echo "OR-Tools PID: $ORTOOLS_PID"
 
 # Comprehensive diagnostics
 echo "=== Running diagnostics ==="
@@ -98,13 +105,19 @@ check_process() {
 while true; do
     if ! check_process $PHP_FPM_PID "PHP-FPM"; then
         echo "PHP-FPM died, checking logs..."
-        kill $NGINX_PID 2>/dev/null
+        kill $NGINX_PID $ORTOOLS_PID 2>/dev/null
         exit 1
     fi
 
     if ! check_process $NGINX_PID "Nginx"; then
         echo "Nginx died, checking logs..."
-        kill $PHP_FPM_PID 2>/dev/null
+        kill $PHP_FPM_PID $ORTOOLS_PID 2>/dev/null
+        exit 1
+    fi
+
+    if ! check_process $ORTOOLS_PID "OR-Tools API"; then
+        echo "OR-Tools API died, checking logs..."
+        kill $PHP_FPM_PID $NGINX_PID 2>/dev/null
         exit 1
     fi
 

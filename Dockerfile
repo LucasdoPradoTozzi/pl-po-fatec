@@ -18,7 +18,10 @@ RUN apt-get update && apt-get install -y \
     libjpeg62-turbo-dev \
     libgd-dev \
     jpegoptim optipng pngquant gifsicle \
-    nginx
+    nginx \
+    python3 \
+    python3-pip \
+    python3-venv
 
 # Install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -54,6 +57,10 @@ RUN npm ci
 
 # Copy application code
 COPY . .
+
+# Setup OR-Tools Python environment
+RUN python3 -m venv /var/www/html/microservices/ortools/venv && \
+    /var/www/html/microservices/ortools/venv/bin/pip install --no-cache-dir -r /var/www/html/microservices/ortools/requirements.txt
 
 # Generate optimized autoloader first
 RUN composer dump-autoload --optimize --no-dev
